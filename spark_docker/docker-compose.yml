@@ -12,6 +12,7 @@ services:
     environment:
       - SPARK_LOCAL_IP=spark-master
       - SPARK_WORKLOAD=master
+
   spark-worker-a:
     image: cluster-apache-spark:3.0.2
     ports:
@@ -30,6 +31,7 @@ services:
     volumes:
        - ./apps:/opt/spark-apps
        - ./data:/opt/spark-data
+
   spark-worker-b:
     image: cluster-apache-spark:3.0.2
     ports:
@@ -48,6 +50,45 @@ services:
     volumes:
         - ./apps:/opt/spark-apps
         - ./data:/opt/spark-data
+
+  spark-worker-c:
+    image: cluster-apache-spark:3.0.2
+    ports:
+      - "9093:8080"
+      - "7002:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-c
+    volumes:
+        - ./apps:/opt/spark-apps
+        - ./data:/opt/spark-data
+
+  spark-worker-d:
+    image: cluster-apache-spark:3.0.2
+    ports:
+      - "9094:8080"
+      - "7003:7000"
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_DRIVER_MEMORY=1G
+      - SPARK_EXECUTOR_MEMORY=1G
+      - SPARK_WORKLOAD=worker
+      - SPARK_LOCAL_IP=spark-worker-d
+    volumes:
+        - ./apps:/opt/spark-apps
+        - ./data:/opt/spark-data
+
   demo-database:
     image: postgres:11.7-alpine
     ports: 
