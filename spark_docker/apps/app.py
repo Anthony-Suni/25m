@@ -1,22 +1,24 @@
-from pyspark.sql import SparkSession
+from pyspark import SparkConf, SparkContext
 
-# Configurar la sesión Spark
-spark = SparkSession.builder.appName("HolaMundo").getOrCreate()
+# Configurar la aplicación Spark
+conf = SparkConf().setAppName("HolaMundo").setMaster("local[1]")
 
-# Leer el archivo CSV
-lines = spark.read.csv("../data/ratings.csv", sep=',', header=True, inferSchema=True)
+# Crear el contexto Spark
+sc = SparkContext(conf=conf)
+# Leer el archivo de datos de calificaciones
+lines = sc.textFile("../data/u.data")
 
-ratings = lines.rdd.map(lambda x: x[2])
+ratings = lines.map(lambda x: x.split('\t')[2])  
 
 result = ratings.countByValue()
 
-# Mostrar el resultado de la frecuencia de calificaciones
+# Mostrar el resultado
 print("Frecuencia de Calificaciones:")
 sorted_result = sorted(result.items())
 
 for key, value in sorted_result:
     print(f"Calificación {key}: {value} ocurrencias")
-
-# Mostrar las primeras 5 líneas del DataFrame
+    
+# Cambiar el nombre de la variable en el bucle for
 for line in lines.take(5):
     print(line)
